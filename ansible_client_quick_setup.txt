@@ -1,0 +1,17 @@
+1. To connect with ansible server you need to have openssh-server service active and running, also do not forget to configure ansible server first!
+
+2. Creat ansible user and install sudo package:
+	apt install sudo -y
+    adduser --shell /bin/bash --gecos "" ansible
+
+3. Next, add entry for ansible user to sudoers file:
+    visudo
+    * and add this entry to the file:
+        # ansible user permissions
+        ansible ALL=(ALL) NOPASSWD:ALL
+
+4. Now login to the ansible server and copy previously generated ssh key to the client machine:
+    ssh-copy-id ansible@192.168.1.1
+
+5. To secure ansible account on the client machine you can turn off login option for it:
+    usermod -L ansible

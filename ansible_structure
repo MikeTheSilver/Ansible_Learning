@@ -1,0 +1,35 @@
+--- # beggininx of the file
+- name: Nginx setup # name of the playbook
+  hosts: ansible_target # clients on which tasks will be invoked, you can enter here ip, the name of the group declared in the inventory file or "all" for all clients.
+  become: true # this commands is used to ensure that the installation is performed with administrative privileges (sudo)
+  gather_facts: true # this value can be set to true or false and its used to gather information about hosts such as ip address cpu type etc
+  tasks: # beggining of the tasks
+
+    - name: Update apt cache # name of the task
+      apt: # debian apt command
+        update_cache: yes # its basically apt update on linux os
+
+    - name: Install python3-pexpect package
+      apt:
+        name: python3-pexpect # name of the package to install
+        state: present # state of the package, avaiable options are: present, absent, started, stopped, restarted, enabled, disabled, installed, uninstalled
+    
+    - name: Copy script which will setup nginx 
+      copy: # copy file task
+        src: /etc/ansible/playbooks/bash_scripts/nginx.sh # source of the file
+        dest: /tmp/nginx.sh # destaination on the client machine 
+        mode: 755 # permissions to the file 
+
+    - name: "Copy Script" # you can also copy file like that
+      copy: src=/root/ansible/playbooks/script.sh dest=/home/ansible/script.sh mode=0755
+
+
+    - name: Execute script on remote server
+      expect: # it automates ineraction with the script 
+        shell: /tmp/nginx.sh
+        responses: # responses to required input 
+          'Username: ': 'webcms_user' # example response
+          'Site name: ': 'wordpress_site'
+
+    - name: Remove script from the server 
+      shell: rm /tmp/nginx.sh # this command is used for running shell command, you cna also use "command" but "shell" gives you more options such as pipelines and variables

@@ -1,0 +1,73 @@
+---
+- name: Nginx setup
+  hosts: ansible_target
+  become: true
+  gather_facts: false
+  tasks:
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install python3-pexpect package
+      apt:
+        name: python3-pexpect
+        state: present
+
+    - name: Install required packages
+      apt:
+        name:
+          - aptitude
+          - nginx
+          - apache2-utils
+          - expect
+          - mariadb-server
+          - mariadb-client
+          - lsb-release
+          - apt-transport-https
+          - ca-certificates
+        state: present
+  
+    - name: Add php key
+      shell: wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+    
+    - name: Add php repository to sources.d.list
+      shell: echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+    
+    - name: Install PHP packages 
+      apt:
+        name:
+          - php8.2-curl
+          - php8.2-gd
+          - php8.2-intl
+          - php8.2-mbstring
+          - php8.2-soap
+          - php8.2-xml
+          - php8.2-xmlrpc
+          - php8.2-zip
+          - php8.2-mysql
+          - php8.2-fpm
+        state: present
+
+    - name: Copy script which will setup nginx 
+      copy:
+        src: /etc/ansible/playbooks/bash_scripts/wordpress.sh
+        dest: /tmp/wordpress.sh
+        mode: 0755
+
+    - name: Execute script on remote server
+      expect:
+        command: /tmp/wordpress.sh
+        responses:
+          'Username: ': 'www'
+          'Site name: ': 'example.com'
+          'Database password: ': 'SecurePass'
+      ignore_errors: yes
+
+    - name: Remove script from the server 
+      shell: rm /tmp/wordpress.sh
+
