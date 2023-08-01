@@ -1,0 +1,11 @@
+---
+- name: Remove package
+  hosts: <ansible_target>
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Removing
+      apt:
+        name: <package name>
+        state: absent
+

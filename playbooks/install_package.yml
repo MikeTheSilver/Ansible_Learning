@@ -1,0 +1,11 @@
+---
+- name: Install package
+  hosts: <ansible_target>
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Instalation
+      apt:
+        name: <package name>
+        state: latest # avaiable options: latest, absent, present
+

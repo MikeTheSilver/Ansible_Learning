@@ -1,0 +1,14 @@
+---
+- name: Create SSH user
+  hosts: <ansible_target>
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Creating user
+      ansible.builtin.user:
+        name: <username>
+        password: <password>
+        shell: /bin/bash
+        comment: <description (optional you can remove this line)>
+        uid: 1040 <uid (optional you can remove this line)>
+        group: <group name>
