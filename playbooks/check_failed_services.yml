@@ -1,0 +1,38 @@
+# DESCRIPTION
+#    This script is used on fetch_logs.yml file and its purpose is to fetch some data from exim logs. Remember to install RSYNC on ansible server before running script.
+#
+# TASKS
+#    1. Update apt cache.
+#    1. Install python3-pexpect and rsync packages required for running expect command.
+#    2. Copy fetch_logs.sh script to client machine.
+#    3. Run bash script fetch_logs.sh to generate file, remember to specify value for grep.
+#    4. Delete script mentioned above from the client machine.
+#    5. Install rsync package, it is required to download files from client machines
+#    6. Copy files from client machine to ansible server.
+#    7. Delete created files from client machine.
+#
+# VERSION
+#       1.0 - Initial version
+#       
+# CODE
+---
+- name: Fetch logs from server
+  hosts: <ansible_target>
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Create file with service names that failed to start
+      shell: systemctl list-units | grep -i failed > failed_services
+
+    - name: Fetch file from client machine
+      ansible.builtin.fetch:
+        src: failed_services
+        dest: /home/ansible
+
+    #- name: Remove created file
+    #  shell: rm failed_services  
+
+    - name: Remove created file
+      ansible.builtin.file:
+        path: failed_services
+        state: absent
