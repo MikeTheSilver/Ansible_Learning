@@ -1,0 +1,66 @@
+# DESCRIPTION
+#    This script is used on fetch_logs.yml file and its purpose is to fetch some data from exim logs. Remember to install RSYNC on ansible server before running script.
+#
+# TASKS
+#    1. Update apt cache.
+#    1. Install python3-pexpect and rsync packages required for running expect command.
+#    2. Copy fetch_logs.sh script to client machine.
+#    3. Run bash script fetch_logs.sh to generate file, remember to specify value for grep.
+#    4. Delete script mentioned above from the client machine.
+#    5. Install rsync package, it is required to download files from client machines
+#    6. Copy files from client machine to ansible server.
+#    7. Delete created files from client machine.
+#
+# VERSION
+#       1.0 - Initial version
+#       
+# CODE
+---
+- name: Fetch logs from server
+  hosts: <ansible_target>
+  become: true
+  gather_facts: false
+  tasks:
+
+    - name: 1. Update apt cache
+      apt:
+        update_cache: yes
+  
+    - name: 2. Install python3-pexpect and rsync package
+      apt:
+        name: 
+          - python3-pexpect
+# Need to confirm if its needed
+#          - software-properties-common 
+          - rsync
+        state: present
+
+    - name: 3. Copy script for generating logs to client machine 
+      copy:
+        src: /etc/ansible/playbooks/bash_scripts/fetch_logs.sh
+        dest: /tmp/fetch_logs.sh
+        mode: 0755
+
+    - name: 4. Execute script on client machine
+      expect:
+        command: /tmp/fetch_logs.sh
+        responses:
+          'String for grep: ': '<value for grep>'
+
+    - name: 5. Remove script from the client machine 
+      shell: rm /tmp/fetch_logs.sh
+
+    - name: 6. Fetch exim4 directory from client machine
+      synchronize:
+        src: /tmp/exim4   
+        dest: /home/ansible/logs      # specify directory where you want to copy your files   
+        mode: pull        
+
+#   Fetch module is used from copying files not directories!
+#    - name: 6. Fetch file from client machine
+#      ansible.builtin.fetch:
+#        src: /tmp/exim4
+#        dest: /exim4
+
+    - name: 7. Remove created catalog from tmp directory
+      shell: rm -r /tmp/exim4  
