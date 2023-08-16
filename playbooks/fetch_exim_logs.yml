@@ -1,19 +1,19 @@
 # DESCRIPTION
-#    This script is used on fetch_logs.yml file and its purpose is to fetch some data from exim logs. Remember to install RSYNC on ansible server before running script.
+#    This playbook fetch exim logs which contains specified string (check task 4). Remember to install RSYNC on ansible server before running script.
 #
 # TASKS
 #    1. Update apt cache.
-#    1. Install python3-pexpect and rsync packages required for running expect command.
-#    2. Copy fetch_logs.sh script to client machine.
-#    3. Run bash script fetch_logs.sh to generate file, remember to specify value for grep.
-#    4. Delete script mentioned above from the client machine.
-#    5. Install rsync package, it is required to download files from client machines
+#    2. Install python3-pexpect and rsync packages required for running expect command.
+#    3. Copy fetch_logs.sh script to client machine.
+#    4. Run bash script fetch_logs.sh to generate file, remember to specify value for grep.
+#    5. Delete script mentioned above from the client machine.
 #    6. Copy files from client machine to ansible server.
 #    7. Delete created files from client machine.
 #
 # VERSION
 #       1.0 - Initial version
-#       
+#       1.1 - Updated description       
+#
 # CODE
 ---
 - name: Fetch logs from server

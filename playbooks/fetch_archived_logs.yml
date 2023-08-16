@@ -1,0 +1,61 @@
+# DESCRIPTION
+#    This script is used on fetch_logs.yml file and its purpose is to fetch some data from exim logs. Remember to install RSYNC on ansible server before running script.
+#
+# TASKS
+#    1. Update apt cache.
+#    2. Install python3-pexpect and rsync packages on client machine.
+#    3. Copy script pack_logs.sh to client machine
+#    4. Execute script mentioned above.
+#    5. Remove script from machine.
+#    6. Get hostname of the client
+#    7. Copy generated directory from client machine/
+#    8. Delete that directory.
+#
+# VERSION
+#       1.0 - Initial version
+#
+# CODE
+---
+- name: Fetch logs from server
+  hosts: <ansible_target>
+  become: true
+  gather_facts: false
+  tasks:
+    - name: 1. Update apt cache
+      apt:
+        update_cache: yes
+  
+    - name: 2. Install python3-pexpect and rsync package
+      apt:
+        name: 
+          - python3-pexpect
+          - rsync
+
+    - name: 3. Copy bash script for generating zip files to client machine 
+      copy:
+        src: /etc/ansible/playbooks/bash_scripts/pack_logs.sh
+        dest: /tmp/pack_logs.sh
+        mode: 0755
+
+    - name: 4. Execute script on client machine
+      shell: /tmp/pack_logs.sh
+
+    - name: 5. Remove script from the client machine 
+      shell: rm /tmp/pack_logs.sh
+
+    - name: 6. Get client hostname
+      set_fact:
+        client_hostname: "{{ dnsname }}" 
+ 
+#    - name: Display variable with spaces
+#      debug:
+#        var: hostvars[dnsname].variable_with_spaces | replace('_', ' ')
+  
+    - name: 7. Copy log directory from the client machine
+      synchronize:
+        src: "/tmp/{{ client_hostname }}"
+        dest: "/home/ansible"
+        mode: pull        
+
+    - name: 8. Remove created catalog from tmp directory
+      shell: rm -r "/tmp/{{ client_hostname }}" 

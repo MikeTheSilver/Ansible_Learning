@@ -1,2 +1,2 @@
 [name of the targets]
-192.168.1.1 <-- Ip of host you can add multiple addreses
+server1 ansible_host=1.1.1.1 dnsname="dns server name"
