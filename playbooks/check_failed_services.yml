@@ -18,7 +18,10 @@
   gather_facts: false
   tasks:
     - name: 1. Create file with service names that failed to start
-      shell: systemctl list-units | grep -i failed > failed_services
+      shell: |
+        touch failed_services
+        systemctl list-units | grep -i failed > failed_services
+        if [ ! -s "failed_services" ]; then echo "There is no failed services on that machine" > failed_services ; fi
 
     - name: 2. Fetch file from client machine
       ansible.builtin.fetch:

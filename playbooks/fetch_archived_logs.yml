@@ -41,7 +41,9 @@
       shell: /tmp/pack_logs.sh
 
     - name: 5. Remove script from the client machine 
-      shell: rm /tmp/pack_logs.sh
+      ansible.builtin.file:
+        path: /tmp/pack_logs.sh
+        state: absent
 
     - name: 6. Get client hostname
       set_fact:
@@ -58,4 +60,6 @@
         mode: pull        
 
     - name: 8. Remove created catalog from tmp directory
-      shell: rm -r "/tmp/{{ client_hostname }}" 
+      ansible.builtin.file:
+        path: /tmp/{{ client_hostname }}
+        state: absent
