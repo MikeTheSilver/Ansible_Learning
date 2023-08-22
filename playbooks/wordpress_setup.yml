@@ -1,3 +1,22 @@
+# DESCRIPTION
+#    With this playbook you can setup wordpress on nginx and mysql database.
+#
+# TASKS
+#    1. Update apt cache. 
+#    2. Install required packages.
+#    3. Add php key to apt.
+#    4. Add php repo to sources list.
+#    5. Update apt cache again.
+#    6. Install php packages.
+#    7. Copy script to client machine.
+#    8. Execute script on client machine.
+#    9. Remove script from client machine.
+#
+# VERSION
+#       1.0 - Initial version
+#       1.1 - Added description
+#       
+# CODE
 ---
 - name: Nginx setup
   hosts: ansible_target
@@ -5,18 +24,14 @@
   gather_facts: false
   tasks:
 
-    - name: Update apt cache
+    - name: 1. Update apt cache
       apt:
         update_cache: yes
 
-    - name: Install python3-pexpect package
+    - name: 2. Install python3-pexpect package
       apt:
-        name: python3-pexpect
-        state: present
-
-    - name: Install required packages
-      apt:
-        name:
+        name: 
+          - python3-pexpect
           - aptitude
           - nginx
           - apache2-utils
@@ -28,17 +43,17 @@
           - ca-certificates
         state: present
   
-    - name: Add php key
+    - name: 3. Add php key
       shell: wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
     
-    - name: Add php repository to sources.d.list
+    - name: 4. Add php repository to sources.d.list
       shell: echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list
 
-    - name: Update apt cache
+    - name: 5. Update apt cache
       apt:
         update_cache: yes
     
-    - name: Install PHP packages 
+    - name: 6. Install PHP packages 
       apt:
         name:
           - php8.2-curl
@@ -53,21 +68,20 @@
           - php8.2-fpm
         state: present
 
-    - name: Copy script which will setup nginx 
+    - name: 7. Copy script which will setup nginx 
       copy:
         src: /etc/ansible/playbooks/bash_scripts/wordpress.sh
         dest: /tmp/wordpress.sh
         mode: 0755
 
-    - name: Execute script on remote server
+    - name: 8. Execute script on remote server
       expect:
         command: /tmp/wordpress.sh
         responses:
           'Username: ': 'www'
           'Site name: ': 'example.com'
           'Database password: ': 'SecurePass'
-      ignore_errors: yes
 
-    - name: Remove script from the server 
+    - name: 9. Remove script from the server 
       shell: rm /tmp/wordpress.sh
 

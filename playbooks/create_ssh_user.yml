@@ -1,3 +1,14 @@
+# DESCRIPTION
+#    Playbook for creating ssh user on 
+#
+# TASKS
+#    1. Create user for SSH connections
+#
+# VERSION
+#       1.0 - Initial version
+#       1.1 - Added description
+#       
+# CODE
 ---
 - name: Create SSH user
   hosts: <ansible_target>
